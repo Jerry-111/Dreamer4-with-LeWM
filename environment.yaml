@@ -12,6 +12,8 @@ dependencies:
     - pillow==12.0.0
     - glfw==2.10.0
     - gpustat==1.1.1
+    - h5py==3.16.0
+    - hdf5plugin==6.0.0
     - lpips==0.1.4
     - numpy==1.24.4
     - tensordict==0.10.0

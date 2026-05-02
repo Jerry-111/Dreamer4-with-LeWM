@@ -1,4 +1,7 @@
 {
+  "pusht": {
+    "action_dim": 2
+  },
   "walker-stand": {
     "embodiment": "2D walker with 6 controllable joints across 2 legs",
     "instruction": "Stand upright and maintain balance",

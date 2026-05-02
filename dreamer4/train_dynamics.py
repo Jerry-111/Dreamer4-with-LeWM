@@ -581,6 +581,7 @@ def train(args):
     device = torch.device(f"cuda:{local_rank}" if torch.cuda.is_available() else "cpu")
 
     seed_everything(args.seed + rank)
+    tasks = TASK_SET if args.tasks is None else args.tasks
 
     # Dataset and DataLoader
     if args.use_actions:
@@ -592,7 +593,7 @@ def train(args):
             img_size=128,
             action_dim=16,
             tasks_json=args.tasks_json,
-            tasks=TASK_SET,
+            tasks=tasks,
             verbose=is_rank0(),
         )
         sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True) if ddp else None
@@ -611,7 +612,7 @@ def train(args):
     else:
         dataset = ShardedFrameDataset(
             outdirs=args.frame_dirs,
-            tasks=TASK_SET,
+            tasks=tasks,
             seq_len=args.seq_len,
         )
         sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True) if ddp else None
@@ -914,6 +915,7 @@ if __name__ == "__main__":
         "/<path>/mixed-large-shards",
     ])
     p.add_argument("--tasks_json", type=str, default="../tasks.json")  # task metadata
+    p.add_argument("--tasks", type=str, nargs="+", default=None)
     p.add_argument("--seq_len", type=int, default=32)
     p.add_argument("--num_workers", type=int, default=8)
     p.add_argument("--batch_size", type=int, default=24)
