@@ -231,7 +231,10 @@
   const btnDisconnect = document.getElementById("btnDisconnect");
 
   const proto = (location.protocol === "https:") ? "wss" : "ws";
-  const wsUrl = `${proto}://${location.host}/ws`;
+  const pathPrefix = location.pathname.endsWith("/")
+    ? location.pathname.slice(0, -1)
+    : location.pathname;
+  const wsUrl = `${proto}://${location.host}${pathPrefix}/ws`;
   let ws = null;
   let lastUrl = null;
 
@@ -272,15 +275,31 @@
   }
 
   function connect() {
+    statusEl.textContent = `connecting ${wsUrl}`;
     ws = new WebSocket(wsUrl);
     ws.binaryType = "arraybuffer";
 
-    ws.onopen = () => { statusEl.textContent = "connected"; };
-    ws.onclose = () => {
-      statusEl.textContent = "disconnected";
+    const connectTimer = setTimeout(() => {
+      if (ws && ws.readyState === WebSocket.CONNECTING) {
+        statusEl.textContent = `still connecting to ${wsUrl}`;
+      }
+    }, 3000);
+
+    ws.onopen = () => {
+      clearTimeout(connectTimer);
+      statusEl.textContent = "connected";
+    };
+    ws.onclose = (ev) => {
+      clearTimeout(connectTimer);
+      const detail = ev.code ? ` (${ev.code})` : "";
+      statusEl.textContent = `disconnected${detail}`;
       setPaused(false);
     };
-    ws.onerror = () => { statusEl.textContent = "error"; };
+    ws.onerror = (ev) => {
+      clearTimeout(connectTimer);
+      console.error("websocket error", ev, wsUrl);
+      statusEl.textContent = `websocket error: ${wsUrl}`;
+    };
 
     ws.onmessage = (ev) => {
       if (typeof ev.data === "string") {

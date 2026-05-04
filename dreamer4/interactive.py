@@ -362,6 +362,7 @@ def decode_single_packed_frame(
     z2 = _as_2d_packed(z_packed)
     z_bt = z2.unsqueeze(0).unsqueeze(0)  # (1,1,n_spatial,d_spatial)
     z_btLd = unpack_spatial_to_bottleneck(z_bt, k=packing_factor, d_bottleneck=d_bottleneck)
+    z_btLd = z_btLd.to(dtype=next(decoder.parameters()).dtype)
     patches = decoder(z_btLd)  # (1,1,Np,Dp)
     frames = temporal_unpatchify(patches, H, W, C, patch)  # (1,1,C,H,W)
     return frames[0, 0].clamp(0, 1)
@@ -439,7 +440,9 @@ class InteractiveServer:
         self.html = load_html(args.html, fallback="<html><body>missing html</body></html>")
 
         # task
-        self.tasks = list(TASK_SET)
+        self.tasks = list(TASK_SET) if args.tasks is None else list(args.tasks)
+        if len(self.tasks) == 0:
+            raise ValueError("--tasks must contain at least one task when provided")
         self.initial_task = args.task if args.task in self.tasks else self.tasks[0]
 
         # tokenizer
@@ -784,6 +787,7 @@ def main():
     p = argparse.ArgumentParser()
 
     p.add_argument("--task", type=str, default="finger-turn-hard")
+    p.add_argument("--tasks", type=str, nargs="+", default=None)
 
     # data
     p.add_argument("--data_dir", type=str, default="/<path>/data")   # path to raw data

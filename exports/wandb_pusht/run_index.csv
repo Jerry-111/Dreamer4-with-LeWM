@@ -1,0 +1,4 @@
+entity,project,run_id,run_name,run_path,state,created_at,updated_at,url
+jerrychsh-ucsd,dreamer4-tokenizer,qpuq9n6z,pusht-tokenizer,jerrychsh-ucsd/dreamer4-tokenizer/qpuq9n6z,killed,2026-05-02T02:20:46Z,,https://wandb.ai/jerrychsh-ucsd/dreamer4-tokenizer/runs/qpuq9n6z
+jerrychsh-ucsd,dreamer4-dynamics,qrmkey4s,pusht-dynamics,jerrychsh-ucsd/dreamer4-dynamics/qrmkey4s,killed,2026-05-02T20:33:10Z,,https://wandb.ai/jerrychsh-ucsd/dreamer4-dynamics/runs/qrmkey4s
+jerrychsh-ucsd,dreamer4-dynamics,q1j6xmvj,pusht-dynamics-resume-40k,jerrychsh-ucsd/dreamer4-dynamics/q1j6xmvj,killed,2026-05-03T22:32:45Z,,https://wandb.ai/jerrychsh-ucsd/dreamer4-dynamics/runs/q1j6xmvj
