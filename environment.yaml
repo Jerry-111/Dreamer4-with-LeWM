@@ -21,4 +21,4 @@ dependencies:
     - torchvision==0.23.0
     - torchrl==0.10.0
     - transformers==4.56.2
-    - wandb==0.22.1
+    - wandb==0.27.0
