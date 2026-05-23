@@ -592,6 +592,7 @@ def train(args):
             seq_len=args.seq_len,
             img_size=128,
             action_dim=16,
+            cache_mb=args.dataset_cache_mb,
             tasks_json=args.tasks_json,
             tasks=tasks,
             verbose=is_rank0(),
@@ -918,6 +919,7 @@ if __name__ == "__main__":
     p.add_argument("--tasks", type=str, nargs="+", default=None)
     p.add_argument("--seq_len", type=int, default=32)
     p.add_argument("--num_workers", type=int, default=8)
+    p.add_argument("--dataset_cache_mb", type=int, default=256)
     p.add_argument("--batch_size", type=int, default=24)
 
     # tokenizer restore

@@ -202,22 +202,29 @@ After tokenizer training produces:
 ./logs/tokenizer_ckpts/latest.pt
 ```
 
-run action-conditioned dynamics training:
+run action-conditioned dynamics training. On Kubernetes, prefer persistent paths under `/jerry_slow_vol`; `/root` is temporary and may disappear after pod/container restarts. For a 4x V100 pod with a 64 GiB CPU-RAM limit, keep the dataset shard cache below the old 2 GiB-per-worker default:
 
 ```bash
-torchrun --nproc_per_node=1 train_dynamics.py \
+torchrun --nproc_per_node=4 train_dynamics.py \
   --use_actions \
   --tasks pusht \
-  --data_dirs /root/data/pusht-raw \
-  --frame_dirs /root/data/pusht-shards \
+  --data_dirs /jerry_slow_vol/data/pusht-raw \
+  --frame_dirs /jerry_slow_vol/data/pusht-shards \
   --tasks_json ../tasks.json \
-  --tokenizer_ckpt ./logs/tokenizer_ckpts/latest.pt \
+  --tokenizer_ckpt /jerry_slow_vol/dreamer4-runs/pusht-v100/tokenizer_ckpts/step_0100000.pt \
+  --ckpt_dir /jerry_slow_vol/dreamer4-runs/pusht-v100/dynamics_ckpts_b16x4_cache256 \
   --wandb_entity jerrychsh-ucsd \
-  --wandb_run_name pusht-dynamics \
-  --batch_size 24 \
+  --wandb_run_name pusht-dynamics-v100-b16x4-cache256 \
+  --batch_size 16 \
   --num_workers 8 \
-  --save_every 10000
+  --dataset_cache_mb 256 \
+  --eval_every 0 \
+  --log_every 20 \
+  --save_every 10000 \
+  --max_steps 40001
 ```
+
+With `--nproc_per_node=4 --num_workers 8 --dataset_cache_mb 256`, the dataset cache budget is about `4 * 8 * 256 MiB = 8 GiB`. This cache only affects input-pipeline speed and CPU RAM usage; it does not change the model, batch semantics, loss, or expected results.
 
 ## Open Questions / Next Checks
 
